@@ -311,24 +311,6 @@ print(f"Execution details: {execution}")
 - Suggested wine pairings and seasonal specialties
 - Provided insider tips for reservation strategies
 
-## 🤝 Contributing
-
-Feel free to:
-
-- Add support for more dietary restrictions
-- Improve the YAML workflow configuration
-- Add new output formats (PDF, HTML)
-- Enhance error handling and retry logic
-
-## 📞 Support
-
-If you encounter issues:
-
-1. Check the troubleshooting section above
-2. Verify your API key and internet connection
-3. Try running with default parameters first
-4. Check the generated JSON files for partial results
-
 ## 🏗️ Built With
 
 - **[Julep](https://julep.ai)**: AI workflow orchestration platform
