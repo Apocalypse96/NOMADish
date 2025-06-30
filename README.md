@@ -24,7 +24,7 @@ NOMADish automatically:
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repository-url>
+git clone https://github.com/Apocalypse96/NOMADish.git
 cd NOMADish
 ```
 
