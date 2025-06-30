@@ -1,0 +1,118 @@
+name: Global Foodie Tour Planner
+description: A streamlined foodie tour planner that generates complete guides quickly
+
+########################################################
+################### INPUT SCHEMA #######################
+########################################################
+
+input_schema:
+  type: object
+  properties:
+    cities:
+      type: array
+      items:
+        type: string
+      description: List of cities to create foodie tours for
+      minItems: 1
+      maxItems: 3
+    dietary_preferences:
+      type: array
+      items:
+        type: string
+        enum: ["vegetarian", "vegan", "gluten-free", "halal", "kosher", "none"]
+      description: Dietary restrictions or preferences
+      default: ["none"]
+    budget_level:
+      type: string
+      enum: ["budget", "mid-range", "upscale", "luxury"]
+      description: Budget preference for restaurant recommendations
+      default: "mid-range"
+
+########################################################
+################### MAIN WORKFLOW ######################
+########################################################
+
+main:
+  # Step 1: Generate complete foodie tour for each city using AI knowledge
+  - over: $ steps[0].input.cities
+    parallelism: 2
+    map:
+      prompt:
+        - role: system
+          content: >-
+            You are an expert culinary travel advisor and food critic with deep knowledge of global cuisines.
+            Create a detailed one-day foodie tour for the given city that includes weather-aware dining suggestions.
+
+        - role: user
+          content: >-
+            $ f'''Create a complete one-day foodie tour for {_}.
+
+            Requirements:
+            - Dietary preferences: {", ".join(steps[0].input.dietary_preferences)}
+            - Budget level: {steps[0].input.budget_level}
+            - Include 3 meals: breakfast, lunch, dinner
+            - Feature 3 iconic local dishes that represent the city's culinary heritage
+            - Recommend specific restaurants for each meal
+            - Consider weather for indoor/outdoor dining suggestions
+            - Include rich, appetizing descriptions that make readers hungry
+            - Add cultural context for each dish
+
+            Format your response as:
+
+            🏙️ {_.upper()} CULINARY ADVENTURE
+
+            🌅 BREAKFAST: [Iconic Local Dish]
+            📍 Restaurant: [Specific restaurant name and area]
+            🍽️ Description: [Detailed, mouth-watering description with cultural context]
+            ☁️ Weather Note: [Indoor/outdoor dining suggestion]
+
+            🍽️ LUNCH: [Signature Mid-day Specialty]  
+            📍 Restaurant: [Specific restaurant name and area]
+            🍽️ Description: [Detailed, appetizing description with local significance]
+            ☁️ Weather Note: [Venue atmosphere and weather considerations]
+
+            🌙 DINNER: [Memorable Evening Experience]
+            📍 Restaurant: [Specific restaurant name and area]
+            🍽️ Description: [Vivid description that captures the essence of local dining]
+            ☁️ Weather Note: [Ambiance and weather-appropriate suggestions]
+
+            💡 Local Tips:
+            - [3-4 practical tips for dining in this city]
+            - [Cultural dining etiquette or customs]
+            - [Best times to visit restaurants]
+
+            Make this feel like a love letter to {_}'s food scene!'''
+      unwrap: true
+
+  # Step 2: Create the complete guide combining all city tours
+  - return:
+      complete_foodie_guide: |-
+        $ f'''🍴 GLOBAL FOODIE TOUR GUIDE 🌍
+
+        Cities: {", ".join(steps[0].input.cities)}
+        Dietary Preferences: {", ".join(steps[0].input.dietary_preferences)}
+        Budget Level: {steps[0].input.budget_level}
+        Generated: Today
+
+        ═══════════════════════════════════════════════════════════════
+
+        {"\n\n".join(f"{tour}\n\n{'═' * 60}" for tour in steps[0].output)}
+
+        ✨ Bon Appétit! Your personalized foodie adventures await! ✨
+
+        💡 Universal Pro Tips:
+        - Always check restaurant hours and make reservations when possible
+        - Carry cash as some local spots may not accept cards  
+        - Don't hesitate to ask locals for their secret recommendations
+        - Take photos and notes to remember your culinary journey
+        - Stay hydrated and pace yourself throughout the day
+        - Try to learn a few food-related phrases in the local language
+        - Be adventurous but respect your dietary restrictions
+
+        🌟 Remember: The best meals are often found where locals eat!
+
+        Happy eating! 🥘🍜🍲🍱🌮🍕
+        '''
+      individual_tours: $ steps[0].output
+      cities_processed: $ steps[0].input.cities
+      preferences: $ steps[0].input.dietary_preferences
